@@ -7,6 +7,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { MonitoringScreen } from "./src/screens/MonitoringScreen.js";
 import { ControlScreen } from "./src/screens/ControlScreen.js";
 import { assertConfig } from "./src/services/config.js";
+// --- TAMBAHAN ---
+import { AnalysisScreen } from "./src/screens/AnalysisScreen.js";
+// --- AKHIR TAMBAHAN ---
 
 const Tab = createBottomTabNavigator();
 
@@ -39,13 +42,25 @@ export default function App() {
             tabBarActiveTintColor: "#2563eb",
             tabBarInactiveTintColor: "#94a3b8",
             tabBarIcon: ({ color, size }) => {
-              const iconName = route.name === "Monitoring" ? "analytics" : "options";
+              // --- MODIFIKASI ---
+              let iconName;
+              if (route.name === "Monitoring") {
+                iconName = "analytics";
+              } else if (route.name === "Control") {
+                iconName = "options";
+              } else if (route.name === "Analysis") {
+                iconName = "stats-chart"; // Icon baru untuk halaman Analysis
+              }
               return <Ionicons name={iconName} size={size} color={color} />;
+              // --- AKHIR MODIFIKASI ---
             },
           })}
         >
           <Tab.Screen name="Monitoring" component={MonitoringScreen} />
           <Tab.Screen name="Control" component={ControlScreen} />
+          {/* --- TAMBAHAN --- */}
+          <Tab.Screen name="Analysis" component={AnalysisScreen} />
+          {/* --- AKHIR TAMBAHAN --- */}
         </Tab.Navigator>
       </NavigationContainer>  
     </SafeAreaProvider>

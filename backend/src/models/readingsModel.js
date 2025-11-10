@@ -9,6 +9,10 @@ function normalize(row) {
     temperature: row.temperature === null ? null : Number(row.temperature),
     threshold_value:
       row.threshold_value === null ? null : Number(row.threshold_value),
+    // --- TAMBAHAN ---
+    temperature_difference:
+      row.temperature_difference === null ? null : Number(row.temperature_difference),
+    // --- AKHIR TAMBAHAN ---
   };
 }
 
@@ -16,7 +20,9 @@ export const ReadingsModel = {
   async list() {
     const { data, error } = await supabase
       .from(TABLE)
-      .select("id, temperature, threshold_value, recorded_at")
+      // --- MODIFIKASI ---
+      .select("id, temperature, threshold_value, temperature_difference, recorded_at")
+      // --- AKHIR MODIFIKASI ---
       .order("recorded_at", { ascending: false })
       .limit(100);
 
@@ -27,7 +33,9 @@ export const ReadingsModel = {
   async latest() {
     const { data, error } = await supabase
       .from(TABLE)
-      .select("id, temperature, threshold_value, recorded_at")
+      // --- MODIFIKASI ---
+      .select("id, temperature, threshold_value, temperature_difference, recorded_at")
+      // --- AKHIR MODIFIKASI ---
       .order("recorded_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -43,15 +51,27 @@ export const ReadingsModel = {
       throw new Error("temperature must be a number");
     }
 
+    // --- TAMBAHAN: Hitung selisih temperatur ---
+    const difference =
+      typeof temperature === "number" && typeof threshold_value === "number"
+        ? temperature - threshold_value
+        : null;
+    // --- AKHIR TAMBAHAN ---
+
     const newRow = {
       temperature,
       threshold_value: threshold_value ?? null,
+      // --- TAMBAHAN ---
+      temperature_difference: difference,
+      // --- AKHIR TAMBAHAN ---
     };
 
     const { data, error } = await supabase
       .from(TABLE)
       .insert(newRow)
-      .select("id, temperature, threshold_value, recorded_at")
+      // --- MODIFIKASI ---
+      .select("id, temperature, threshold_value, temperature_difference, recorded_at")
+      // --- AKHIR MODIFIKASI ---
       .single();
 
     if (error) throw error;
